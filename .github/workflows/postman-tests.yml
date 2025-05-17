@@ -1,0 +1,44 @@
+name: Run Postman API Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  postman-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Newman and reporters
+        run: npm install -g newman newman-reporter-html
+
+      - name: Create reports directory
+        run: mkdir -p .postman/reports
+
+      - name: Run Postman tests
+        run: |
+          newman run ./todo-api.postman_collection.json \
+            -e ./todo-api.postman_environment.json \
+            -r cli,html \
+            --reporter-html-export .postman/reports/test-results.html
+        continue-on-error: true
+
+      - name: Upload Postman test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-test-report
+          path: .postman/reports
+          retention-days: 7
+          if-no-files-found: warn

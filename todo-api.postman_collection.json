@@ -1,0 +1,1006 @@
+{
+	"info": {
+		"_postman_id": "888590eb-1617-4bb5-a874-4f09d76b93ac",
+		"name": "Todo API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32195973"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"item": [
+						{
+							"name": "Successful - Valid Details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Login response should return status code 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Login response should contain a token\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property(\"token\");",
+											"    pm.expect(jsonData.token).to.be.a(\"string\");",
+											"    pm.expect(jsonData.token.length).to.be.greaterThan(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"ovansa@gmail.com\",\n  \"password\": \"Password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/login",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/login \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"ovansa@gmail.com\",\n  \"password\": \"Password123\"\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Suuccessful - Login - New Email and Password",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomNumber = Math.floor(1000 + Math.random() * 9000);",
+											"const firstNames = ['John', 'Jane', 'Alice', 'Bob', 'Diana'];",
+											"const lastNames = ['Smith', 'Brown', 'Taylor', 'Lee', 'Johnson'];",
+											"const fullName = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;",
+											"const email = `user${randomNumber}@example.com`;",
+											"const password = 'Password123';",
+											"",
+											"const requestBody = {",
+											"  email,",
+											"  fullName,",
+											"  password",
+											"};",
+											"",
+											"pm.collectionVariables.set(\"newEmail\", email);",
+											"pm.collectionVariables.set(\"newFullName\", fullName);",
+											"pm.collectionVariables.set(\"newPassword\", password);",
+											"",
+											"// Send registration request",
+											"pm.sendRequest({",
+											"  url: pm.environment.get(\"BASE_URL\") + \"/auth/register\",",
+											"  method: 'POST',",
+											"  header: {",
+											"    'Content-Type': 'application/json',",
+											"    'Accept': 'application/json'",
+											"  },",
+											"  body: {",
+											"    mode: 'raw',",
+											"    raw: JSON.stringify(requestBody)",
+											"  }",
+											"}, function (err, res) {",
+											"  if (err) {",
+											"    console.error(\"Registration failed:\", err);",
+											"    return;",
+											"  }",
+											"",
+											"  console.log(\"Registration successful:\", res.json());",
+											"  if (res.json().token) {",
+											"    pm.environment.set(\"token\", res.json().token);",
+											"  }",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Login response should return status code 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"pm.test(\"Login response should contain a token\", function () {",
+											"    const jsonData = pm.response.json();",
+											"    pm.expect(jsonData).to.have.property(\"token\").that.is.a(\"string\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{newEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/login",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/login \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"{{newEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Unsuccessful - Email Not Exist",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Login response should return status code 401\", function () {",
+											"    pm.response.to.have.status(401);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Login response should include a code with value 'INVALID_CREDENTIALS'\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"code\", \"INVALID_CREDENTIALS\");",
+											"});",
+											"",
+											"pm.test(\"Login response should include a message about invalid credentials\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Invalid email or password\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"doesnotexist@gmail.com\",\n  \"password\": \"Password123\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/login",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/login \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"{{newEmail}}\",\n  \"password\": \"{{newPassword}}\"\n}'"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Register",
+					"item": [
+						{
+							"name": "Successful - Valid Details",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomNumber = Math.floor(1000 + Math.random() * 9000);",
+											"",
+											"const firstNames = ['John', 'Jane', 'Alice', 'Bob', 'Diana'];",
+											"const lastNames = ['Smith', 'Brown', 'Taylor', 'Lee', 'Johnson'];",
+											"",
+											"const fullName = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;",
+											"const email = `user${randomNumber}@example.com`;",
+											"const password = 'Password123';",
+											"",
+											"// Save values to environment variables",
+											"pm.collectionVariables.set('email', email);",
+											"pm.collectionVariables.set('fullName', fullName);",
+											"pm.collectionVariables.set('password', password);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 201\", function () {",
+											"  pm.response.to.have.status(201);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Email should match the one set in environment\", function () {",
+											"  pm.expect(jsonData.email).to.equal(pm.collectionVariables.get(\"email\"));",
+											"});",
+											"",
+											"pm.test(\"Full name should match the one set in environment\", function () {",
+											"  pm.expect(jsonData.fullName).to.equal(pm.collectionVariables.get(\"fullName\"));",
+											"});",
+											"",
+											"pm.test(\"ID should be present and not empty\", function () {",
+											"  pm.expect(jsonData).to.have.property(\"id\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{email}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/register",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/register \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"{{email}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Unsuccessful - Short Password",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomNumber = Math.floor(1000 + Math.random() * 9000);",
+											"",
+											"const firstNames = ['John', 'Jane', 'Alice', 'Bob', 'Diana'];",
+											"const lastNames = ['Smith', 'Brown', 'Taylor', 'Lee', 'Johnson'];",
+											"",
+											"const fullName = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;",
+											"const email = `user${randomNumber}@example.com`;",
+											"const shortPassword = 'Pass';",
+											"",
+											"// Save values to environment variables",
+											"pm.collectionVariables.set('email', email);",
+											"pm.collectionVariables.set('fullName', fullName);",
+											"pm.collectionVariables.set('shortPassword', shortPassword);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 400\", function () {",
+											"    pm.response.to.have.status(400);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Response should include a code with value 'VALIDATION_ERROR'\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"code\", \"VALIDATION_ERROR\");",
+											"});",
+											"",
+											"pm.test(\"Response should include a message that describes the error\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Password must be at least 6 characters\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{email}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{shortPassword}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/register",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/register \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"{{email}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Unsuccessful - Invalid Email Format",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomNumber = Math.floor(1000 + Math.random() * 9000);",
+											"",
+											"const firstNames = ['John', 'Jane', 'Alice', 'Bob', 'Diana'];",
+											"const lastNames = ['Smith', 'Brown', 'Taylor', 'Lee', 'Johnson'];",
+											"",
+											"const fullName = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;",
+											"const invalidEmail = `invalidEmail`;",
+											"const password = 'Password123';",
+											"",
+											"pm.collectionVariables.set('invalidEmail', invalidEmail);",
+											"pm.collectionVariables.set('fullName', fullName);",
+											"pm.collectionVariables.set('password', password);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 400\", function () {",
+											"  pm.response.to.have.status(400);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Response should include a code with value 'VALIDATION_ERROR'\", function () {",
+											"  pm.expect(jsonData).to.have.property(\"code\", \"VALIDATION_ERROR\");",
+											"});",
+											"",
+											"pm.test(\"Response should include a message that describes the error\", function () {",
+											"  pm.expect(jsonData).to.have.property(\"message\", \"Email must be a valid email\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{invalidEmail}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/register",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/register \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"{{email}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Unsuccessful - Invalid Email Format",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const randomNumber = Math.floor(1000 + Math.random() * 9000);",
+											"",
+											"const firstNames = ['John', 'Jane', 'Alice', 'Bob', 'Diana'];",
+											"const lastNames = ['Smith', 'Brown', 'Taylor', 'Lee', 'Johnson'];",
+											"",
+											"const fullName = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;",
+											"const invalidEmail = `invalidEmail`;",
+											"const password = 'Password123';",
+											"",
+											"pm.collectionVariables.set('invalidEmail', invalidEmail);",
+											"pm.collectionVariables.set('fullName', fullName);",
+											"pm.collectionVariables.set('password', password);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 400\", function () {",
+											"  pm.response.to.have.status(400);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Response should include a code with value 'VALIDATION_ERROR'\", function () {",
+											"  pm.expect(jsonData).to.have.property(\"code\", \"VALIDATION_ERROR\");",
+											"});",
+											"",
+											"pm.test(\"Response should include a message that describes the error\", function () {",
+											"  pm.expect(jsonData).to.have.property(\"message\", \"Email must be a valid email\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"{{invalidEmail}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/auth/register",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/auth/register \\\n  --header 'accept: application/json' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"email\": \"{{email}}\",\n  \"fullName\": \"{{fullName}}\",\n  \"password\": \"{{password}}\"\n}'"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Todo",
+			"item": [
+				{
+					"name": "Create Todo",
+					"item": [
+						{
+							"name": "Successful - Title and Completed Status",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const actions = ['Buy', 'Clean', 'Fix', 'Read', 'Write', 'Watch'];",
+											"const items = ['groceries', 'desk', 'report', 'book', 'email', 'movie'];",
+											"",
+											"const randomAction = actions[Math.floor(Math.random() * actions.length)];",
+											"const randomItem = items[Math.floor(Math.random() * items.length)];",
+											"const completed = Math.random() < 0.5;",
+											"",
+											"const title = `${randomAction} ${randomItem}`;",
+											"",
+											"pm.collectionVariables.set(\"title\", title);",
+											"pm.collectionVariables.set(\"completed\", completed);",
+											"",
+											"console.log(\"Random title set:\", title);",
+											"console.log(\"completed:\", completed);",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Title should match the one set in env variable\", function () {",
+											"    pm.expect(jsonData.title).to.equal(pm.collectionVariables.get(\"title\"));",
+											"});",
+											"",
+											"pm.test(\"Completed should match the one set in env variable\", function () {",
+											"    const completedEnv = pm.collectionVariables.get(\"completed\");",
+											"    const completedBool = (completedEnv === 'true' || completedEnv === true);",
+											"    pm.expect(jsonData.completed).to.equal(completedBool);",
+											"});",
+											"",
+											"pm.test(\"ID should be present and not empty\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"id\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											"",
+											"pm.test(\"User ID should be present and not empty\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"userId\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											"",
+											"pm.test(\"Created and updated timestamps should exist\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"createdAt\").that.is.a(\"string\").and.not.empty;",
+											"    pm.expect(jsonData).to.have.property(\"updatedAt\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "authorization",
+										"value": "Bearer {{todoToken}}"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"{{title}}\",\n  \"completed\": {{completed}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/todos",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"todos"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/todos \\\n  --header 'accept: application/json' \\\n  --header 'authorization: Bearer {{todoToken}}' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"title\": \"{{title}}\",\n  \"completed\": {{completed}}\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Successful - Only Title",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const actions = ['Buy', 'Clean', 'Fix', 'Read', 'Write', 'Watch'];",
+											"const items = ['groceries', 'desk', 'report', 'book', 'email', 'movie'];",
+											"",
+											"const randomAction = actions[Math.floor(Math.random() * actions.length)];",
+											"const randomItem = items[Math.floor(Math.random() * items.length)];",
+											"",
+											"const title = `${randomAction} ${randomItem}`;",
+											"",
+											"pm.collectionVariables.set(\"title\", title);",
+											"",
+											"console.log(\"Random title set:\", title);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Title should match the one set in env variable\", function () {",
+											"    pm.expect(jsonData.title).to.equal(pm.collectionVariables.get(\"title\"));",
+											"});",
+											"",
+											"pm.test(\"Completed should be false by default\", function () {",
+											"    pm.expect(jsonData.completed).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"ID should be present and not empty\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"id\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											"",
+											"pm.test(\"User ID should be present and not empty\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"userId\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											"",
+											"pm.test(\"Created and updated timestamps should exist\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"createdAt\").that.is.a(\"string\").and.not.empty;",
+											"    pm.expect(jsonData).to.have.property(\"updatedAt\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "authorization",
+										"value": "Bearer {{todoToken}}"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"{{title}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/todos",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"todos"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/todos \\\n  --header 'accept: application/json' \\\n  --header 'authorization: Bearer {{todoToken}}' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"title\": \"{{title}}\",\n  \"completed\": {{completed}}\n}'"
+							},
+							"response": []
+						},
+						{
+							"name": "Successful - Only Title",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const actions = ['Buy', 'Clean', 'Fix', 'Read', 'Write', 'Watch'];",
+											"const items = ['groceries', 'desk', 'report', 'book', 'email', 'movie'];",
+											"",
+											"const randomAction = actions[Math.floor(Math.random() * actions.length)];",
+											"const randomItem = items[Math.floor(Math.random() * items.length)];",
+											"",
+											"const title = `${randomAction} ${randomItem}`;",
+											"",
+											"pm.collectionVariables.set(\"title\", title);",
+											"",
+											"console.log(\"Random title set:\", title);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response should return status code 201\", function () {",
+											"    pm.response.to.have.status(201);",
+											"});",
+											"",
+											"const jsonData = pm.response.json();",
+											"",
+											"pm.test(\"Title should match the one set in env variable\", function () {",
+											"    pm.expect(jsonData.title).to.equal(pm.collectionVariables.get(\"title\"));",
+											"});",
+											"",
+											"pm.test(\"Completed should be false by default\", function () {",
+											"    pm.expect(jsonData.completed).to.equal(false);",
+											"});",
+											"",
+											"pm.test(\"ID should be present and not empty\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"id\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											"",
+											"pm.test(\"User ID should be present and not empty\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"userId\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											"",
+											"pm.test(\"Created and updated timestamps should exist\", function () {",
+											"    pm.expect(jsonData).to.have.property(\"createdAt\").that.is.a(\"string\").and.not.empty;",
+											"    pm.expect(jsonData).to.have.property(\"updatedAt\").that.is.a(\"string\").and.not.empty;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "authorization",
+										"value": "Bearer {{todoToken}}"
+									},
+									{
+										"key": "content-type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"title\": \"{{title}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{BASE_URL}}/todos",
+									"host": [
+										"{{BASE_URL}}"
+									],
+									"path": [
+										"todos"
+									]
+								},
+								"description": "Generated from cURL: curl --request POST \\\n  --url http://todo-app-go-jq45.onrender.com/todos \\\n  --header 'accept: application/json' \\\n  --header 'authorization: Bearer {{todoToken}}' \\\n  --header 'content-type: application/json' \\\n  --data '{\n  \"title\": \"{{title}}\",\n  \"completed\": {{completed}}\n}'"
+							},
+							"response": []
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.sendRequest({",
+							"  url: pm.environment.get(\"BASE_URL\") + \"/auth/login\",",
+							"  method: \"POST\",",
+							"  header: {",
+							"    \"accept\": \"application/json\",",
+							"    \"content-type\": \"application/json\"",
+							"  },",
+							"  body: {",
+							"    mode: \"raw\",",
+							"    raw: JSON.stringify({",
+							"      email: \"ovansa@gmail.com\",",
+							"      password: \"Password123\"",
+							"    })",
+							"  }",
+							"}, function (err, res) {",
+							"  if (err) {",
+							"    console.error(\"Login request failed:\", err);",
+							"    return;",
+							"  }",
+							"  const responseData = res.json();",
+							"  if (responseData.token) {",
+							"    pm.collectionVariables.set(\"todoToken\", responseData.token);",
+							"    console.log(\"Token stored in todoToken:\", responseData.token);",
+							"  }",
+							"});",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "newEmail",
+			"value": ""
+		},
+		{
+			"key": "newFullName",
+			"value": ""
+		},
+		{
+			"key": "newPassword",
+			"value": ""
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "fullName",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "shortPassword",
+			"value": ""
+		},
+		{
+			"key": "invalidEmail",
+			"value": ""
+		},
+		{
+			"key": "title",
+			"value": ""
+		},
+		{
+			"key": "completed",
+			"value": ""
+		},
+		{
+			"key": "todoToken",
+			"value": ""
+		}
+	]
+}
